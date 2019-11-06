@@ -6,7 +6,7 @@ import javax.ejb.Stateful;
 import rental.RentalStore;
 
 @Stateful
-public class CarRentalSession implements CarRentalSessionRemote {
+public class CarRentalSession extends Session implements CarRentalSessionRemote {
 
     @Override
     public Set<String> getAllRentalCompanies() {

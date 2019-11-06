@@ -6,6 +6,6 @@ import javax.ejb.Remote;
 @Remote
 public interface CarRentalManagerSessionRemote {
 
-    void intialize(String name);
+    void initialize(String name);
     
 }
