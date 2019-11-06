@@ -4,7 +4,10 @@ import java.util.Date;
 import java.util.List;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import rental.CarType;
+import rental.Quote;
 import rental.Reservation;
+import rental.ReservationConstraints;
 import session.CarRentalManagerSessionRemote;
 import session.CarRentalSessionRemote;
 
@@ -24,31 +27,40 @@ public class Main extends AbstractTestAgency<CarRentalSessionRemote, CarRentalMa
 
     @Override
     protected CarRentalSessionRemote getNewReservationSession(String name) throws Exception {
-        CarRentalSessionRemote session = (CarRentalSessionRemote)context.lookup(CarRentalSessionRemote.class.getName());
+        String beanID = "java:global/CarRental/CarRental-ejb/CarRentalSession";
+        CarRentalSessionRemote session = (CarRentalSessionRemote)context.lookup(beanID);
         session.initialize(name);
         return session;
     }
 
     @Override
     protected CarRentalManagerSessionRemote getNewManagerSession(String name) throws Exception {
-        CarRentalManagerSessionRemote session = (CarRentalManagerSessionRemote)context.lookup(CarRentalManagerSessionRemote.class.getName());
+        String beanID = "java:global/CarRental/CarRental-ejb/CarRentalManagerSession";
+        CarRentalManagerSessionRemote session = (CarRentalManagerSessionRemote)context.lookup(beanID);
         session.initialize(name);
         return session;    
     }
 
     @Override
     protected void getAvailableCarTypes(CarRentalSessionRemote session, Date start, Date end) throws Exception {
-        System.out.println("found rental companies: "+session.getAllRentalCompanies());
+        System.out.println("Available car types :");
+        for (String type : session.getAvailableCarTypes(start, end))
+            System.out.println(type);
     }
 
     @Override
     protected void createQuote(CarRentalSessionRemote session, String name, Date start, Date end, String carType, String region) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ReservationConstraints constraints = new ReservationConstraints(start, end, carType, region);
+        session.createQuote(constraints, name);
+	System.out.println("Quote created for client named '" + name + "'.");
     }
 
     @Override
     protected List<Reservation> confirmQuotes(CarRentalSessionRemote session, String name) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Confirming quotes :");
+        for (Quote quote : session.getCurrentQuotes())
+            System.out.println(quote);
+        return session.confirmQuotes();
     }
 
     @Override
