@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import rental.CarType;
 import rental.Quote;
 import rental.Reservation;
 import rental.ReservationConstraints;
@@ -65,12 +64,12 @@ public class Main extends AbstractTestAgency<CarRentalSessionRemote, CarRentalMa
 
     @Override
     protected int getNumberOfReservationsBy(CarRentalManagerSessionRemote ms, String clientName) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return ms.getNbOfReservationsByRenter(clientName);
     }
 
     @Override
     protected int getNumberOfReservationsForCarType(CarRentalManagerSessionRemote ms, String carRentalName, String carType) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return ms.getNbOfReservationsForCarType(carRentalName, carType);
     }
     
 }

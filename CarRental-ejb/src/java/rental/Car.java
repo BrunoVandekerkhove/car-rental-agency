@@ -1,6 +1,7 @@
 package rental;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +41,10 @@ public class Car {
      * RESERVATIONS *
      ****************/
 
+    int getNbReservations() {
+        return reservations.size();
+    }
+    
     public boolean isAvailable(Date start, Date end) {
         if(!start.before(end))
             throw new IllegalArgumentException("Illegal given period");
