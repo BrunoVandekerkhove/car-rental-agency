@@ -34,10 +34,15 @@ public class Main extends AbstractTestAgency<CarRentalSessionRemote, CarRentalMa
 
     @Override
     protected CarRentalManagerSessionRemote getNewManagerSession(String name) throws Exception {
-        String beanID = "java:global/CarRental/CarRental-ejb/CarRentalManagerSession";
-        CarRentalManagerSessionRemote session = (CarRentalManagerSessionRemote)context.lookup(beanID);
-        session.initialize(name);
-        return session;    
+        try {
+            String beanID = "java:global/CarRental/CarRental-ejb/CarRentalManagerSession";
+            CarRentalManagerSessionRemote session = (CarRentalManagerSessionRemote)context.lookup(beanID);
+            session.initialize(name);
+            return session;
+        }
+        catch (NamingException e) {
+            throw new IllegalArgumentException("The given manager does not exist.");
+        }
     }
 
     @Override
@@ -64,12 +69,22 @@ public class Main extends AbstractTestAgency<CarRentalSessionRemote, CarRentalMa
 
     @Override
     protected int getNumberOfReservationsBy(CarRentalManagerSessionRemote ms, String clientName) throws Exception {
-        return ms.getNbOfReservationsByRenter(clientName);
+       if (ms == null)
+          throw new IllegalArgumentException("Manager session is null.");
+       System.out.println("Getting number of reservations by '" + clientName + "' ...");
+       int numberOfReservations = ms.getNbOfReservationsByRenter(clientName);
+       System.out.println("Number of reservations made by client "+ clientName + " : " + numberOfReservations);
+       return numberOfReservations;
     }
 
     @Override
     protected int getNumberOfReservationsForCarType(CarRentalManagerSessionRemote ms, String carRentalName, String carType) throws Exception {
-        return ms.getNbOfReservationsForCarType(carRentalName, carType);
+       if (ms == null)
+          throw new IllegalArgumentException("Manager session is null.");
+       System.out.println("Getting number of reservations for a specific car type ...");
+       int numberOfReservations = ms.getNbOfReservationsForCarType(carRentalName, carType);
+       System.out.println("Reservations for car type " + carType + " at company '" + carRentalName + "' : " + numberOfReservations);
+       return numberOfReservations;
     }
     
 }

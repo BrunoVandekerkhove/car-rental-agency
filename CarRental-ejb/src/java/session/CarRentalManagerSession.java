@@ -1,12 +1,15 @@
 package session;
 
-import javax.ejb.Stateful;
+import java.util.Map;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
 import rental.CarRentalCompany;
 import rental.RentalStore;
 
-@Stateful
+@Stateless
+@RolesAllowed({"Manager"})
 public class CarRentalManagerSession extends Session implements CarRentalManagerSessionRemote {
-
+    
     @Override
     public int getNbOfReservationsForCarType(String carRentalName, String carType) {
         return RentalStore.getRental(carRentalName).getReservationsForCarType(carType);

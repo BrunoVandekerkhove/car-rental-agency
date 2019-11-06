@@ -1,6 +1,5 @@
 package session;
 
-import java.util.Set;
 import javax.ejb.Remote;
 
 @Remote
