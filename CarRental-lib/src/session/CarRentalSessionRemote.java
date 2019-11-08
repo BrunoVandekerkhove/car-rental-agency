@@ -12,14 +12,17 @@ import rental.ReservationException;
 
 @Remote
 public interface CarRentalSessionRemote {
-
-    void initialize(String name);
     
-    Set<String> getAllRentalCompanies();
-    Set<String> getAvailableCarTypes(Date start, Date end);
+    public void setRenterName(String name);
     
-    public void createQuote(ReservationConstraints constraints, String client) throws ReservationException;
+    public Set<String> getAllRentalCompanies();
+    
+    public List<CarType> getAvailableCarTypes(Date start, Date end);
+    
+    public Quote createQuote(String company, ReservationConstraints constraints) throws ReservationException;
+    
     public List<Quote> getCurrentQuotes();
+    
     public List<Reservation> confirmQuotes() throws ReservationException;
     
 }

@@ -5,12 +5,12 @@ public class Reservation extends Quote {
     private int carId;
     
     /***************
-	 * CONSTRUCTOR *
-	 ***************/
+     * CONSTRUCTOR *
+     ***************/
 
     public Reservation(Quote quote, int carId) {
     	super(quote.getCarRenter(), quote.getStartDate(), quote.getEndDate(), 
-    			quote.getRentalCompany(), quote.getCarType(), quote.getRentalPrice());
+    		quote.getRentalCompany(), quote.getCarType(), quote.getRentalPrice());
         this.carId = carId;
     }
     

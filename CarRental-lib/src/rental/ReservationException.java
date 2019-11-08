@@ -6,4 +6,7 @@ public class ReservationException extends Exception {
         super(string);
     }
     
+    public ReservationException(Throwable t) {
+        super(t);
+    }
 }

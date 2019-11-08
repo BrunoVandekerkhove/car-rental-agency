@@ -1,15 +1,14 @@
 package rental;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Car {
 
     private int id;
     private CarType type;
-    private List<Reservation> reservations;
+    private Set<Reservation> reservations;
 
     /***************
      * CONSTRUCTOR *
@@ -18,7 +17,7 @@ public class Car {
     public Car(int uid, CarType type) {
     	this.id = uid;
         this.type = type;
-        this.reservations = new ArrayList<Reservation>();
+        this.reservations = new HashSet<Reservation>();
     }
 
     /******
@@ -36,15 +35,14 @@ public class Car {
     public CarType getType() {
         return type;
     }
-
+	
+	public void setType(CarType type) {
+		this.type = type;
+	}
     /****************
      * RESERVATIONS *
      ****************/
 
-    int getNbReservations() {
-        return reservations.size();
-    }
-    
     public boolean isAvailable(Date start, Date end) {
         if(!start.before(end))
             throw new IllegalArgumentException("Illegal given period");
@@ -65,8 +63,8 @@ public class Car {
         // equals-method for Reservation is required!
         reservations.remove(reservation);
     }
-	
-	public List<Reservation> getAllReservations() {
+
+    public Set<Reservation> getReservations() {
         return reservations;
     }
 }
