@@ -6,13 +6,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import rental.Car;
-import rental.CarRentalCompany;
 import rental.CarType;
 import rental.RentalStore;
 import rental.Reservation;
 
 @Stateless
-public class ManagerSession implements ManagerSessionRemote {
+public class ManagerSession extends Session implements ManagerSessionRemote {
     
     @Override
     public Set<CarType> getCarTypes(String company) {

@@ -1,10 +1,9 @@
 package rental;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
-public class Car {
+public class Car implements Serializable {
 
     private int id;
     private CarType type;
