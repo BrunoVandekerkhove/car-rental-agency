@@ -17,16 +17,16 @@ import rental.ReservationException;
 public class CarRentalSession implements CarRentalSessionRemote {
 
     private String renter;
-    private List<Quote> quotes = new LinkedList<Quote>();
+    private List<Quote> quotes = new LinkedList<>();
 
     @Override
     public Set<String> getAllRentalCompanies() {
-        return new HashSet<String>(RentalStore.getRentals().keySet());
+        return new HashSet<>(RentalStore.getRentals().keySet());
     }
     
     @Override
     public List<CarType> getAvailableCarTypes(Date start, Date end) {
-        List<CarType> availableCarTypes = new LinkedList<CarType>();
+        List<CarType> availableCarTypes = new LinkedList<>();
         for(String crc : getAllRentalCompanies()) {
             for(CarType ct : RentalStore.getRentals().get(crc).getAvailableCarTypes(start, end)) {
                 if(!availableCarTypes.contains(ct))

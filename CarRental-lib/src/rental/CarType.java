@@ -1,19 +1,21 @@
 package rental;
 
 import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
-public class CarType implements Serializable{
+@Entity
+public class CarType implements Serializable {
     
+    @Id
     private String name;
+    
     private int nbOfSeats;
     private boolean smokingAllowed;
     private double rentalPricePerDay;
-    //trunk space in liters
-    private float trunkSpace;
-    
-    /***************
-     * CONSTRUCTOR *
-     ***************/
+    private float trunkSpace; // Trunk space in liters
+
+    public CarType() {}
     
     public CarType(String name, int nbOfSeats, float trunkSpace, double rentalPricePerDay, boolean smokingAllowed) {
         this.name = name;
@@ -43,9 +45,7 @@ public class CarType implements Serializable{
     	return trunkSpace;
     }
     
-    /*************
-     * TO STRING *
-     *************/
+    // Serialisable
     
     @Override
     public String toString() {
@@ -56,9 +56,7 @@ public class CarType implements Serializable{
     @Override
     public int hashCode() {
         final int prime = 31;
-	int result = 1;
-	result = prime * result + ((name == null) ? 0 : name.hashCode());
-	return result;
+	return ((name == null) ? 0 : name.hashCode()) + prime;
     }
 
     @Override
@@ -77,4 +75,5 @@ public class CarType implements Serializable{
             return false;
 	return true;
     }
+    
 }

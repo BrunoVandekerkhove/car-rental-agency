@@ -74,4 +74,19 @@ public class ManagerSession implements ManagerSessionRemote {
         return out.size();
     }
 
+    @Override
+    public int getNumberOfReservations(String clientName) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Set<String> getBestClients() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public CarType getMostPopularCarTypeIn(String carRentalCompanyName, int year) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }
