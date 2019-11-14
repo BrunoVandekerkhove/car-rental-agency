@@ -10,6 +10,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import rental.CarType;
 import rental.Reservation;
+import rental.ReservationConstraints;
 import session.CarRentalSessionRemote;
 import session.ManagerSessionRemote;
 
@@ -77,7 +78,7 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
 
     @Override
     protected void createQuote(CarRentalSessionRemote session, String name, Date start, Date end, String carType, String region) throws Exception {
-        session.createQuote(name, start, end, carType, region);
+        session.createQuote(name, new ReservationConstraints(start, end, carType, region));
     }
 
     @Override

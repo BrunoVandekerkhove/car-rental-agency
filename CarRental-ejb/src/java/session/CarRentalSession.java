@@ -38,13 +38,9 @@ public class CarRentalSession implements CarRentalSessionRemote {
 
     @Override
     public Quote createQuote(String company, ReservationConstraints constraints) throws ReservationException {
-        try {
-            Quote out = RentalStore.getRental(company).createQuote(constraints, renter);
-            quotes.add(out);
-            return out;
-        } catch(Exception e) {
-            throw new ReservationException(e);
-        }
+        Quote out = RentalStore.getRental(company).createQuote(constraints, renter);
+        quotes.add(out);
+        return out;
     }
 
     @Override
@@ -59,7 +55,7 @@ public class CarRentalSession implements CarRentalSessionRemote {
             for (Quote quote : quotes) {
                 done.add(RentalStore.getRental(quote.getRentalCompany()).confirmQuote(quote));
             }
-        } catch (Exception e) {
+        } catch (ReservationException e) {
             for(Reservation r:done)
                 RentalStore.getRental(r.getRentalCompany()).cancelReservation(r);
             throw new ReservationException(e);
@@ -74,4 +70,10 @@ public class CarRentalSession implements CarRentalSessionRemote {
         }
         renter = name;
     }
+
+    @Override
+    public CarType getCheapestCarType(Date start, Date end, String region) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
 }
