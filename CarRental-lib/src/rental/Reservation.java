@@ -22,13 +22,10 @@ public class Reservation extends Quote {
     	return carId;
     }
     
-    /*************
-     * TO STRING *
-     *************/
-    
     @Override
     public String toString() {
         return String.format("Reservation for %s from %s to %s at %s\nCar type: %s\tCar: %s\nTotal price: %.2f", 
                 getCarRenter(), getStartDate(), getEndDate(), getRentalCompany(), getCarType(), getCarId(), getRentalPrice());
-    }	
+    }
+    
 }

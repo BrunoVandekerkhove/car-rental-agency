@@ -18,11 +18,10 @@ public interface CarRentalSessionRemote {
     public Set<String> getAllRentalCompanies();
     
     public List<CarType> getAvailableCarTypes(Date start, Date end);
+    public CarType getCheapestCarType(Date start, Date end, String region);
     
-    public Quote createQuote(String company, ReservationConstraints constraints) throws ReservationException;
-    
+    public Quote createQuote(String name, Date start, Date end, String carType, String region);
     public List<Quote> getCurrentQuotes();
-    
     public List<Reservation> confirmQuotes() throws ReservationException;
     
 }
