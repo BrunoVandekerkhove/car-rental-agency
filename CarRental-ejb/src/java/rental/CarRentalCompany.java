@@ -16,7 +16,6 @@ public class CarRentalCompany {
     private List<Car> cars;
     private Set<CarType> carTypes = new HashSet<CarType>();
 	private List<String> regions;
-
 	
     /***************
      * CONSTRUCTOR *
@@ -187,4 +186,5 @@ public class CarRentalCompany {
         }
         return out;
     }
+    
 }

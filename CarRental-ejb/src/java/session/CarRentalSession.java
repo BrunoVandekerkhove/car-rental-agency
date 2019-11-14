@@ -14,7 +14,7 @@ import rental.ReservationConstraints;
 import rental.ReservationException;
 
 @Stateful
-public class CarRentalSession extends Session implements CarRentalSessionRemote {
+public class CarRentalSession implements CarRentalSessionRemote {
 
     private String renter;
     private List<Quote> quotes = new LinkedList<Quote>();

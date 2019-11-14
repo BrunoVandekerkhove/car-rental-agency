@@ -1,5 +1,8 @@
 package client;
 
+import client.CompanyLoader.CrcData;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +27,15 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
     
     private void registerCompanies() throws NamingException {
         ManagerSessionRemote ms = getNewManagerSession("Registration");
-        
+        CompanyLoader loader = new CompanyLoader();
+        for (String company : Arrays.asList("hertz", "dockx"))
+        try {
+            CrcData data = loader.loadData(company + ".csv");
+            ms.registerCompany(data.name, data.regions, data.cars);
+        }
+        catch (IOException | NumberFormatException e) {
+            System.out.println("Failed to load company named '" + company + "'!");
+        }
     }
     
     private final InitialContext context;
@@ -35,7 +46,7 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
     protected CarRentalSessionRemote getNewReservationSession(String name) throws NamingException {
         String beanID = "java:global/CarRental/CarRental-ejb/CarRentalSession";
         CarRentalSessionRemote session = (CarRentalSessionRemote)context.lookup(beanID);
-        session.initialize(name);
+        session.setRenterName(name);
         return session;
     }
 
@@ -43,9 +54,7 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
     protected ManagerSessionRemote getNewManagerSession(String name) throws NamingException {
         try {
             String beanID = "java:global/CarRental/CarRental-ejb/CarRentalManagerSession";
-            ManagerSessionRemote session = (ManagerSessionRemote)context.lookup(beanID);
-            session.initialize(name);
-            return session;
+            return (ManagerSessionRemote)context.lookup(beanID);
         }
         catch (NamingException e) {
             throw new IllegalArgumentException("The manager session could not be created.");

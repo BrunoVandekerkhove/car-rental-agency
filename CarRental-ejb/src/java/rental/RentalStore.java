@@ -25,7 +25,7 @@ public class RentalStore {
     }
     
     public static synchronized Map<String, CarRentalCompany> getRentals(){
-        if(rentals == null){
+        if (rentals == null){
             rentals = new HashMap<String, CarRentalCompany>();
             loadRental("hertz.csv");
             loadRental("dockx.csv");
@@ -93,4 +93,5 @@ public class RentalStore {
             public String name;
             public List<String> regions =  new LinkedList<String>();
     }
+    
 }
