@@ -7,18 +7,23 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 @Entity
 public class Car implements Serializable {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @OneToOne(cascade=CascadeType.PERSIST)
+    
+    @ManyToOne(cascade=CascadeType.PERSIST)
     private CarType type;
+    
     @OneToMany(cascade=CascadeType.ALL)
+    @JoinColumn(name = "carID")
     private Set<Reservation> reservations;
 
     public Car() {}
@@ -44,10 +49,10 @@ public class Car implements Serializable {
     // Reservations
 
     public boolean isAvailable(Date start, Date end) {
-        if(!start.before(end))
+        if (!start.before(end))
             throw new IllegalArgumentException("Illegal input period!");
-        for(Reservation reservation : reservations) {
-            if(reservation.getEndDate().before(start) || reservation.getStartDate().after(end))
+        for (Reservation reservation : reservations) {
+            if (reservation.getEndDate().before(start) || reservation.getStartDate().after(end))
                 continue;
             return false;
         }

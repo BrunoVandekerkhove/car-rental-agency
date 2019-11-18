@@ -26,37 +26,42 @@ public class CompanyLoader {
     }
 
     public CrcData loadData(String datafile) throws NumberFormatException, IOException {
+
         CrcData out = new CrcData();
         StringTokenizer csvReader;
         int nextuid = 0;
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(CompanyLoader.class.getClassLoader().getResourceAsStream(datafile)))) {
+       
+        try ( //open file from jar
+                BufferedReader in = new BufferedReader(new InputStreamReader(CompanyLoader.class.getClassLoader().getResourceAsStream(datafile)))) {
             while (in.ready()) {
                 String line = in.readLine();
+                
                 if (line.startsWith("#")) {
-                    // Skip comments					
+                    // comment -> skip					
                 } else if (line.startsWith("-")) {
                     csvReader = new StringTokenizer(line.substring(1), ",");
                     out.name = csvReader.nextToken();
                     out.regions = Arrays.asList(csvReader.nextToken().split(":"));
                 } else {
                     csvReader = new StringTokenizer(line, ",");
-                    // Create new car type from first 5 fields
+                    //create new car type from first 5 fields
                     CarType type = new CarType(csvReader.nextToken(),
                             Integer.parseInt(csvReader.nextToken()),
                             Float.parseFloat(csvReader.nextToken()),
                             Double.parseDouble(csvReader.nextToken()),
                             Boolean.parseBoolean(csvReader.nextToken()));
-                    // Create N new cars with given type, where N is the 5th field
+                    //create N new cars with given type, where N is the 5th field
                     for (int i = Integer.parseInt(csvReader.nextToken()); i > 0; i--) {
                         out.cars.add(new Car(nextuid++, type));
                     }        
                 }
             } 
         }
+
         return out;
     }
     
-    public static class CrcData {
+    public class CrcData {
         public List<Car> cars = new LinkedList<>();
         public String name;
         public List<String> regions =  new LinkedList<>();

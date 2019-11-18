@@ -3,6 +3,7 @@ package client;
 import client.CompanyLoader.CrcData;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -22,20 +23,21 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
 
     public Main(String script) throws NamingException {
         super(script);
-        registerCompanies();
         this.context = new InitialContext();
+        registerCompanies();
     }
     
     private void registerCompanies() throws NamingException {
         ManagerSessionRemote ms = getNewManagerSession("Registration");
         CompanyLoader loader = new CompanyLoader();
-        for (String company : Arrays.asList("hertz", "dockx"))
-        try {
-            CrcData data = loader.loadData(company + ".csv");
-            ms.registerCompany(data.name, data.regions, data.cars);
-        }
-        catch (IOException | NumberFormatException e) {
-            System.out.println("Failed to load company named '" + company + "'!");
+        for (String company : Arrays.asList("hertz", "dockx")) {
+            try {
+                CrcData data = loader.loadData(company + ".csv");
+                ms.registerCompany(data.name, data.regions, data.cars);
+            }
+            catch (IOException | NumberFormatException e) {
+                System.out.println("Failed to load company named '" + company + "'!");
+            }
         }
     }
     
@@ -54,7 +56,7 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
     @Override
     protected ManagerSessionRemote getNewManagerSession(String name) throws NamingException {
         try {
-            String beanID = "java:global/CarRental/CarRental-ejb/CarRentalManagerSession";
+            String beanID = "java:global/CarRental/CarRental-ejb/ManagerSession";
             return (ManagerSessionRemote)context.lookup(beanID);
         }
         catch (NamingException e) {
@@ -66,13 +68,20 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
 
     @Override
     protected String getCheapestCarType(CarRentalSessionRemote session, Date start, Date end, String region) throws Exception {
-        return session.getCheapestCarType(start, end, region).toString();
+        return session.getCheapestCarType(start, end, region).getName();
     }
     
     @Override
     protected void getAvailableCarTypes(CarRentalSessionRemote session, Date start, Date end) throws Exception {
         System.out.println("Available car types : ");
-        for (CarType type : session.getAvailableCarTypes(start, end))
+        List<CarType> types = session.getAvailableCarTypes(start, end);
+        types.sort(new Comparator<CarType>() {
+            @Override
+            public int compare(CarType o1, CarType o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+        for (CarType type : types)
             System.out.println(type);
     }
 
@@ -105,7 +114,7 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
 
     @Override
     protected int getNumberOfReservationsForCarType(ManagerSessionRemote ms, String carRentalName, String carType) throws Exception {
-        return ms.getNumberOfReservations(carType, carType);
+        return ms.getNumberOfReservations(carRentalName, carType);
     }
     
 }

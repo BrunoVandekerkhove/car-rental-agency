@@ -1,20 +1,22 @@
 package session;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import rental.Car;
 import rental.CarRentalCompany;
 import rental.CarType;
-import rental.RentalStore;
-import rental.Reservation;
 
 @Stateless
+@RolesAllowed({"Manager"})
 public class ManagerSession implements ManagerSessionRemote {
     
     @PersistenceContext
@@ -28,65 +30,65 @@ public class ManagerSession implements ManagerSessionRemote {
     
     @Override
     public Set<CarType> getCarTypes(String company) {
-        try {
-            return new HashSet<>(RentalStore.getRental(company).getAllTypes());
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(ManagerSession.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
+        return new HashSet<>(entityManager.createNamedQuery("getCarTypes").
+                setParameter("company", company).
+                getResultList());
     }
 
     @Override
     public Set<Integer> getCarIds(String company, String type) {
-        Set<Integer> out = new HashSet<>();
-        try {
-            for(Car c: RentalStore.getRental(company).getCars(type)){
-                out.add(c.getId());
-            }
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(ManagerSession.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
-        return out;
+        return new HashSet<>(entityManager.createNamedQuery("getCarIds").
+                setParameter("company", company).
+                setParameter("type", type).
+                getResultList());
     }
 
     @Override
     public int getNumberOfReservations(String company, String type, int id) {
-        try {
-            return RentalStore.getRental(company).getCar(id).getReservations().size();
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(ManagerSession.class.getName()).log(Level.SEVERE, null, ex);
-            return 0;
-        }
+        return ((Number)entityManager.createNamedQuery("getNumberOfReservationsForId").
+                setParameter("company", company).
+                setParameter("type", type).
+                setParameter("id", id).
+                getSingleResult()).intValue();
     }
 
     @Override
     public int getNumberOfReservations(String company, String type) {
-        Set<Reservation> out = new HashSet<>();
-        try {
-            for(Car c: RentalStore.getRental(company).getCars(type)){
-                out.addAll(c.getReservations());
-            }
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(ManagerSession.class.getName()).log(Level.SEVERE, null, ex);
-            return 0;
-        }
-        return out.size();
+        return ((Number)entityManager.createNamedQuery("getNumberOfReservations").
+                setParameter("company", company).
+                setParameter("type", type).
+                getSingleResult()).intValue();
     }
 
     @Override
     public int getNumberOfReservations(String clientName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return ((Number)entityManager.createNamedQuery("getNumberOfReservationsForRenter").
+                setParameter("renter", clientName).
+                getSingleResult()).intValue();
     }
 
     @Override
     public Set<String> getBestClients() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new HashSet<>(entityManager.createNamedQuery("getBestClients").getResultList());
     }
 
+    
     @Override
     public CarType getMostPopularCarTypeIn(String carRentalCompanyName, int year) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            DateFormat format = new SimpleDateFormat("d/M/y");
+            Date start = format.parse("01/01/" + year);
+            Date end = format.parse("31/12/" + year);
+            return (CarType)entityManager.createNamedQuery("getMostPopularCarTypeIn").
+                setParameter("company", carRentalCompanyName).
+                setParameter("start", start).
+                setParameter("end", end).
+                setMaxResults(1).
+                getSingleResult();
+        }
+        catch (ParseException ignored) {
+            return null;
+        }
     }
 
 }

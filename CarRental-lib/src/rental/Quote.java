@@ -13,9 +13,11 @@ import javax.persistence.TemporalType;
 public class Quote implements Serializable {
 
     @Id @GeneratedValue(strategy=AUTO)
+    private int quoteID;
     
     @Temporal(TemporalType.DATE)
     private Date startDate;
+    
     @Temporal(TemporalType.DATE)
     private Date endDate;
     

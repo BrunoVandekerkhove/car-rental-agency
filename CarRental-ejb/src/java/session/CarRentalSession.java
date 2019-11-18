@@ -5,10 +5,14 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import javax.annotation.Resource;
+import javax.ejb.SessionContext;
 import javax.ejb.Stateful;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import rental.CarRentalCompany;
 import rental.CarType;
 import rental.Quote;
-import rental.RentalStore;
 import rental.Reservation;
 import rental.ReservationConstraints;
 import rental.ReservationException;
@@ -16,31 +20,42 @@ import rental.ReservationException;
 @Stateful
 public class CarRentalSession implements CarRentalSessionRemote {
 
+    @PersistenceContext
+    EntityManager entityManager;
+    
+    @Resource
+    SessionContext ctx;
+    
     private String renter;
     private List<Quote> quotes = new LinkedList<>();
-
+    
     @Override
     public Set<String> getAllRentalCompanies() {
-        return new HashSet<>(RentalStore.getRentals().keySet());
+        return new HashSet<>(entityManager.createNamedQuery("getAllRentalCompanies").getResultList());
     }
     
     @Override
     public List<CarType> getAvailableCarTypes(Date start, Date end) {
-        List<CarType> availableCarTypes = new LinkedList<>();
-        for(String crc : getAllRentalCompanies()) {
-            for(CarType ct : RentalStore.getRentals().get(crc).getAvailableCarTypes(start, end)) {
-                if(!availableCarTypes.contains(ct))
-                    availableCarTypes.add(ct);
-            }
-        }
-        return availableCarTypes;
+        return entityManager.createNamedQuery("getAvailableCarTypes").
+                setParameter("start", start).
+                setParameter("end", end).
+                getResultList();
     }
 
     @Override
-    public Quote createQuote(String company, ReservationConstraints constraints) throws ReservationException {
-        Quote out = RentalStore.getRental(company).createQuote(constraints, renter);
-        quotes.add(out);
-        return out;
+    public Quote createQuote(String name, ReservationConstraints constraints) throws ReservationException {
+        for (String company : getAllRentalCompanies()) {
+            try {
+                CarRentalCompany rental = entityManager.find(CarRentalCompany.class, company);
+                if (rental != null) {
+                    Quote quote = rental.createQuote(constraints, renter);
+                    quotes.add(quote);
+                    return quote;
+                }
+            }
+            catch (IllegalArgumentException | ReservationException ignored) {}
+        }
+        throw new ReservationException("Failed to create quote for renter named '" + renter + "'!");
     }
 
     @Override
@@ -50,30 +65,34 @@ public class CarRentalSession implements CarRentalSessionRemote {
 
     @Override
     public List<Reservation> confirmQuotes() throws ReservationException {
-        List<Reservation> done = new LinkedList<Reservation>();
+        List<Reservation> confirmedQuotes = new LinkedList<>();
         try {
             for (Quote quote : quotes) {
-                done.add(RentalStore.getRental(quote.getRentalCompany()).confirmQuote(quote));
+                CarRentalCompany rental = entityManager.find(CarRentalCompany.class, quote.getRentalCompany());
+                confirmedQuotes.add(rental.confirmQuote(quote));
             }
         } catch (ReservationException e) {
-            for(Reservation r:done)
-                RentalStore.getRental(r.getRentalCompany()).cancelReservation(r);
+            ctx.setRollbackOnly();
             throw new ReservationException(e);
         }
-        return done;
+        return confirmedQuotes;
     }
 
     @Override
     public void setRenterName(String name) {
-        if (renter != null) {
-            throw new IllegalStateException("name already set");
-        }
+        if (renter != null)
+            throw new IllegalStateException("The renter's name is already set!");
         renter = name;
     }
 
     @Override
     public CarType getCheapestCarType(Date start, Date end, String region) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (CarType)entityManager.createNamedQuery("getCheapestCarType").
+                setParameter("start", start).
+                setParameter("end", end).
+                setParameter("region", region).
+                setMaxResults(1).
+                getSingleResult();
     }
     
 }
