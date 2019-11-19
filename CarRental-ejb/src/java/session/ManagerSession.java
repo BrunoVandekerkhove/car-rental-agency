@@ -3,12 +3,15 @@ package session;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import rental.Car;
@@ -17,14 +20,24 @@ import rental.CarType;
 
 @Stateless
 @RolesAllowed({"Manager"})
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public class ManagerSession implements ManagerSessionRemote {
     
     @PersistenceContext
     EntityManager entityManager;
     
     @Override
-    public void registerCompany(String name, List<String> regions, List<Car> cars) {
-        CarRentalCompany company = new CarRentalCompany(name, regions, cars);
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public void registerCompany(String name, List<String> regions) {
+        CarRentalCompany company = new CarRentalCompany(name, regions, new ArrayList<Car>());
+        entityManager.persist(company);
+    }
+    
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public void registerCars(String name, List<Car> cars) {
+        CarRentalCompany company = entityManager.find(CarRentalCompany.class, name);
+        company.addCars(cars);
         entityManager.persist(company);
     }
     

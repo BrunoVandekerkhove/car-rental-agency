@@ -33,7 +33,8 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
         for (String company : Arrays.asList("hertz", "dockx")) {
             try {
                 CrcData data = loader.loadData(company + ".csv");
-                ms.registerCompany(data.name, data.regions, data.cars);
+                ms.registerCompany(data.name, data.regions);
+                ms.registerCars(data.name, data.cars);
             }
             catch (IOException | NumberFormatException e) {
                 System.out.println("Failed to load company named '" + company + "'!");

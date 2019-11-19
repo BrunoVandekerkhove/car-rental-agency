@@ -8,6 +8,8 @@ import java.util.Set;
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateful;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import rental.CarRentalCompany;
@@ -18,6 +20,7 @@ import rental.ReservationConstraints;
 import rental.ReservationException;
 
 @Stateful
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public class CarRentalSession implements CarRentalSessionRemote {
 
     @PersistenceContext
@@ -64,16 +67,19 @@ public class CarRentalSession implements CarRentalSessionRemote {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public List<Reservation> confirmQuotes() throws ReservationException {
         List<Reservation> confirmedQuotes = new LinkedList<>();
         try {
             for (Quote quote : quotes) {
                 CarRentalCompany rental = entityManager.find(CarRentalCompany.class, quote.getRentalCompany());
-                confirmedQuotes.add(rental.confirmQuote(quote));
+                Reservation reservation = rental.confirmQuote(quote);
+                confirmedQuotes.add(reservation);
+                entityManager.persist(reservation);
             }
         } catch (ReservationException e) {
             ctx.setRollbackOnly();
-            throw new ReservationException(e);
+            throw new ReservationException("failed to confirm quotes for renter named '" + renter + "'!");
         }
         return confirmedQuotes;
     }

@@ -96,7 +96,7 @@ public class CarRentalCompany implements Serializable {
     @JoinColumn(name = "companyID")
     private List<Car> cars;
     
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "companyID")
     private Set<CarType> carTypes;
     
@@ -180,6 +180,12 @@ public class CarRentalCompany implements Serializable {
         return availableCars;
     }
 
+    public void addCars(List<Car> cars) {
+        this.cars.addAll(cars);
+        for (Car car : cars)
+            carTypes.add(car.getType());
+    }
+    
     public Quote createQuote(ReservationConstraints constraints, String guest)
             throws ReservationException, IllegalArgumentException {
         LOGGER.log(Level.INFO, "<{0}> Creating tentative reservation for {1} with constraints {2}",
